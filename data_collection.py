@@ -14,6 +14,7 @@ new_player_list = []
 experienced_player_list = []
 
 last_time = time.time()
+last_hour_time = time.time()
 
 def main():
   global MIN_SAMPLE_SIZE
@@ -21,10 +22,21 @@ def main():
   global new_player_list
   global experienced_player_list
   global last_time
+  global last_hour_time
 
   while len(new_player_list) < MIN_SAMPLE_SIZE or len(experienced_player_list) < MIN_SAMPLE_SIZE:
     new_time = time.time()
     if new_time>= last_time+1:
+      if new_time>= last_hour_time+(60*60):
+        last_hour_time = new_time
+        new_player_df = pd.DataFrame(new_player_list)
+        experienced_player_df = pd.DataFrame(experienced_player_list)
+        print(new_player_df)
+        print(experienced_player_df)
+
+        new_player_df.to_csv('new_player.csv')
+        experienced_player_df.to_csv('experienced_player.csv')
+        
       last_time = new_time
       t1 = threading.Thread(target=random_UID_generation, args=())
       t2 = threading.Thread(target=random_UID_generation, args=())
