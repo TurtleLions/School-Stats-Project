@@ -2,24 +2,62 @@ import constants
 import requests
 import pandas as pd
 import random
+import threading
+import time
+import itertools
 api_key = constants.api_key
+MIN_SAMPLE_SIZE = 5000
+
+all_sampled_ids = []
+
+new_player_list = []
+experienced_player_list = []
+
+last_time = time.time()
 
 def main():
-  all_sampled_ids = []
-  new_player_list = []
-  experienced_player_list = []
-  while len(new_player_list) < 5000 or len(experienced_player_list) < 5000:
-    random_list = random.sample(range(1000000000, 1099999999), 100)
-    test_list = [i for i in random_list if i not in all_sampled_ids]
-    removed_list = [i for i in random_list if i in all_sampled_ids]
-    print("Test List: " + str(test_list))
-    print("Removed List: " + str(removed_list))
+  global MIN_SAMPLE_SIZE
+  global all_sampled_ids
+  global new_player_list
+  global experienced_player_list
+  global last_time
 
-    temp_new_player_list, temp_experienced_player_list = stats_search(test_list)
-    all_sampled_ids.extend(test_list)
-    new_player_list.extend(temp_new_player_list)
-    experienced_player_list.extend(temp_experienced_player_list)
-    print(str(len(new_player_list)) + " " + str(len(experienced_player_list)))
+  while len(new_player_list) < MIN_SAMPLE_SIZE or len(experienced_player_list) < MIN_SAMPLE_SIZE:
+    new_time = time.time()
+    if new_time>= last_time+1:
+      last_time = new_time
+      t1 = threading.Thread(target=random_UID_generation, args=())
+      t2 = threading.Thread(target=random_UID_generation, args=())
+      t3 = threading.Thread(target=random_UID_generation, args=())
+      t4 = threading.Thread(target=random_UID_generation, args=())
+      t5 = threading.Thread(target=random_UID_generation, args=())
+      t6 = threading.Thread(target=random_UID_generation, args=())
+      t7 = threading.Thread(target=random_UID_generation, args=())
+      t8 = threading.Thread(target=random_UID_generation, args=())
+      t9 = threading.Thread(target=random_UID_generation, args=())
+      t10 = threading.Thread(target=random_UID_generation, args=())
+
+      t1.start()
+      t2.start()
+      t3.start()
+      t4.start()
+      t5.start()
+      t6.start()
+      t7.start()
+      t8.start()
+      t9.start()
+      t10.start()
+
+      t1.join()
+      t2.join()
+      t3.join()
+      t4.join()
+      t5.join()
+      t6.join()
+      t7.join()
+      t8.join()
+      t9.join()
+      t10.join()
 
   print(str(all_sampled_ids))
   print(str(new_player_list))
@@ -32,6 +70,18 @@ def main():
 
   new_player_df.to_csv('new_player.csv')
   experienced_player_df.to_csv('experienced_player.csv')
+
+def random_UID_generation():
+  random_list = random.sample(range(1000000000, 1099999999), 100)
+  test_list = list(set(random_list).difference(all_sampled_ids))
+  removed_list = list(set(random_list).intersection(all_sampled_ids))
+  print("Test List: " + str(test_list))
+  print("Removed List: " + str(removed_list))
+  temp_new_player_list, temp_experienced_player_list = stats_search(test_list)
+  all_sampled_ids.extend(test_list)
+  new_player_list.extend(temp_new_player_list)
+  experienced_player_list.extend(temp_experienced_player_list)
+  print(str(len(all_sampled_ids))+ " " + str(len(new_player_list)) + " " + str(len(experienced_player_list)))
 
 def stats_search(account_ids):
   api_url = 'https://api.wotblitz.com/wotb/account/info/'
