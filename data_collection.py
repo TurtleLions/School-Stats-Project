@@ -8,7 +8,7 @@ def main():
   all_sampled_ids = []
   new_player_list = []
   experienced_player_list = []
-  while len(new_player_list) < 5000 and len(experienced_player_list) < 5000:
+  while len(new_player_list) < 5000 or len(experienced_player_list) < 5000:
     random_list = random.sample(range(1000000000, 1099999999), 100)
     test_list = [i for i in random_list if i not in all_sampled_ids]
     removed_list = [i for i in random_list if i in all_sampled_ids]
@@ -30,6 +30,9 @@ def main():
   print(new_player_df)
   print(experienced_player_df)
 
+  new_player_df.to_csv('new_player.csv')
+  experienced_player_df.to_csv('experienced_player.csv')
+
 def stats_search(account_ids):
   api_url = 'https://api.wotblitz.com/wotb/account/info/'
   accountstr = ""
@@ -45,7 +48,7 @@ def stats_search(account_ids):
   if response.status_code==200:
     responsejson = response.json()
     for account_id in account_ids:
-      if(responsejson['data'][str(account_id)]!=None and responsejson['data'][str(account_id)]['statistics']['all']['battles']>1000):
+      if(responsejson!=None and responsejson['data']!=None and responsejson['data'][str(account_id)]!=None and responsejson['data'][str(account_id)]['statistics']['all']['battles']>1000):
         spotted = responsejson['data'][str(account_id)]['statistics']['all']['spotted']
         hits = responsejson['data'][str(account_id)]['statistics']['all']['hits']
         frags = responsejson['data'][str(account_id)]['statistics']['all']['frags']
